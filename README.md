@@ -46,6 +46,14 @@ a = counter[512]
 
 _Notice_: Let's say it contains N counters.
 
-### Compare to traditional counters
+### Is it good?
 
-Working on it!
+![Alt text](/perf/perf.png?raw=true "Performanc")
+
+It is not that bad. Comparing to other 2 counters. `ArrayCounter` is
+implemented as an arrar, and `DictCounter` is a dict-ish counter class.
+When the number of counters comes to 16k, `RangeCounter` saves 99% of
+time comparing to other two counters. See `perf/...` for details.
+
+In the performance test, 40% of operations are `query`, 40% are `increment`
+and 20% are `decrement` (similar to a real world case in my project).
