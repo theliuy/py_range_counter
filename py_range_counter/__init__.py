@@ -65,6 +65,26 @@ class _FCTree(object):
     def decrement(self, start, end, count):
         self._decrement(0, 0, self._leaves - 1, start, end, 0, count)
 
+    def fall_down(self):
+        track = collections.deque()
+        track.append((0, 0, self._leaves - 1, 0))
+
+        while track:
+            i, left, right, left_over = track.popleft()
+
+            if i < self._leaves - 1:
+                left_over += self._nodes[i]
+                self._nodes[i] = 0
+
+                mid = left + (right - left) // 2
+                track.append((i * 2 + 1, left, mid, left_over))
+                track.append((i * 2 + 2, mid + 1, right, left_over))
+            else:
+                self._nodes[i] += left_over
+
+    def bottoms(self):
+        return self._nodes[self._leaves - 1:]
+
     def _decrement(self,
                    root, left, right, start, end,
                    left_over, to_deduct):
@@ -217,7 +237,7 @@ class RangeCounter(object):
 
         :param index: the index of a counter
         :type index: int
-        :return: int
+        :rtype: int
         :raise ValueError: if index is out of range
         """
 
@@ -234,10 +254,19 @@ class RangeCounter(object):
                 frequently. It provides a O(N * log N) time complexity when iterating
                 through all counters. (Let's say we initialize N counters)
 
-        :return : int
+        :rtype : int
         """
         for i in range(self._n):
             yield self[i]
+
+    def all(self):
+        """ Get a copy of counter values. It provides O(N) time complexity.
+        """
+        bottoms = []
+        for tree in self._trees:
+            tree.fall_down()
+            bottoms.extend(tree.bottoms())
+        return bottoms
 
     def _validate_index(self, index):
         if not 0 <= index < self._n:

@@ -30,6 +30,9 @@ counter.decrement(50, 800, 6)
 
 # Query counter 512
 a = counter[512]
+
+# Get a copy of all counter values
+counter_values = counter.all()
 ```
 
 ## Performance
@@ -42,6 +45,7 @@ a = counter[512]
 | Increment  | O(log N) + O(log N)     | O(log N) + O(log N)     | Yes    |
 | Decrement  | O(log N) + O(log N)     | O(log N) + O(N)         | No     |
 | Query      | O(log log N) + O(log N) | O(log log N) + O(log N) | Yes    |
+| All        | O(N)                    | O(N)                    | Yes    |
 
 
 _Notice_: Let's say it contains N counters.

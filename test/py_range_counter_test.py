@@ -44,6 +44,7 @@ class PyRangeCounterTests(unittest.TestCase):
                 if a <= j <= b:
                     expected[j] = max(0, expected[j] - count)
                 self.assertEqual(rc[j], expected[j], "index[%s] rc:%s expected:%s" % (j, rc[j], expected[j]))
+            self.assertEqual(rc.all(), expected)
 
     def test_out_of_range(self):
         rc = RangeCounter(20)
