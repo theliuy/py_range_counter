@@ -8,4 +8,6 @@ setup(name='py_range_counter',
       author='Yang Liu',
       author_email='liuyruc@gmail.com',
       packages=['py_range_counter'],
+      url='https://github.com/theliuy/py_range_counter',
+      keywords='counter',
      )
