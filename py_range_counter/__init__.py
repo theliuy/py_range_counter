@@ -10,6 +10,7 @@
 from __future__ import division
 import bisect
 import collections
+import threading
 
 
 class _FCTree(object):
@@ -117,7 +118,7 @@ class RangeCounter(object):
     """
 
     def __init__(self, n):
-        """
+        """ Create a RangeCount with a given size.
 
         :param n: number of counters
         :type n: int
@@ -141,6 +142,7 @@ class RangeCounter(object):
 
         self._trees = tuple(trees)
         self._offsets = tuple(offsets)
+        self._lock = threading.Lock()
 
     @property
     def n(self):
@@ -167,14 +169,16 @@ class RangeCounter(object):
 
         left_bond = self._left_bound(start)
         right_bond = self._left_bound(end)
-        while left_bond <= right_bond:
-            offset = self._offsets[left_bond]
-            tree = self._trees[left_bond]
-            tree.increment(max(offset, start) - offset,
-                           min(end - offset, tree.leaves - 1),
-                           count)
 
-            left_bond += 1
+        with self._lock:
+            while left_bond <= right_bond:
+                offset = self._offsets[left_bond]
+                tree = self._trees[left_bond]
+                tree.increment(max(offset, start) - offset,
+                               min(end - offset, tree.leaves - 1),
+                               count)
+
+                left_bond += 1
 
     def decrement(self, start, end, count=1):
         """ Decrements [counter[start], counter[end]] by count
@@ -197,14 +201,16 @@ class RangeCounter(object):
 
         left_bond = self._left_bound(start)
         right_bond = self._left_bound(end)
-        while left_bond <= right_bond:
-            offset = self._offsets[left_bond]
-            tree = self._trees[left_bond]
-            tree.decrement(max(offset, start) - offset,
-                           min(end - offset, tree.leaves - 1),
-                           count)
 
-            left_bond += 1
+        with self._lock:
+            while left_bond <= right_bond:
+                offset = self._offsets[left_bond]
+                tree = self._trees[left_bond]
+                tree.decrement(max(offset, start) - offset,
+                               min(end - offset, tree.leaves - 1),
+                               count)
+
+                left_bond += 1
 
     def __getitem__(self, index):
         """ Get the number of counter[index]
@@ -217,7 +223,8 @@ class RangeCounter(object):
 
         self._validate_index(index)
         tree_index = self._left_bound(index)
-        return self._trees[tree_index][index - self._offsets[tree_index]]
+        with self._lock:
+            return self._trees[tree_index][index - self._offsets[tree_index]]
 
     def __iter__(self):
         """ Iterate through counters.

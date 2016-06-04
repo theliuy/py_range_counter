@@ -1,5 +1,11 @@
+import os
 import random
+import sys
 import unittest
+
+_PY_PATH = os.path.abspath('..')
+if _PY_PATH not in sys.path:
+    sys.path.insert(0, _PY_PATH)
 
 from py_range_counter import RangeCounter
 
