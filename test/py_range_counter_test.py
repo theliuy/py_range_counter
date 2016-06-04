@@ -3,7 +3,7 @@ import random
 import sys
 import unittest
 
-_PY_PATH = os.path.abspath('..')
+_PY_PATH = os.path.join([os.path.realpath(__file__), '..'])
 if _PY_PATH not in sys.path:
     sys.path.insert(0, _PY_PATH)
 
