@@ -37,6 +37,25 @@ counter_values = counter.all()
 
 ## Performance
 
+Instead of an organic integer array keeping all the counters, `PyRangeCounter`
+is implemented as a tree. The idea is quite simple. Every tree node represents
+a range, and its children represents a subset of it's range. Leaf nodes 
+have the count of a single index. When increment() or decrement() is applied, 
+it is applied to corresponding nodes and their children. The sum of the path to
+leaves donate the actual count of an index. Let's say we initialized 4 counters,
+the data structure shows as below. The value of `[0,2)` donates the count of
+both index 0 and 1. If we apply an increment on range [0,2], both the value of 
+node `[0,2)` and leave node `2` will be incremented.
+
+
+```
+               [0, 4)
+             /        \
+         [0, 2)      [2, 4)
+         /    \      /     \
+        0      1    2       3
+```
+
 `PyRangeCounter` uses O(N) space, (The actual spaces usage is close to
 2N.) and provides,
 
@@ -52,10 +71,10 @@ _Notice_: Let's say it contains N counters.
 
 ### Is it good?
 
-![Alt text](/perf/perf.png?raw=true "Performanc")
+![Alt text](/perf/perf.png?raw=true "Performance")
 
 It is not that bad. Comparing to other 2 counters. `ArrayCounter` is
-implemented as an arrar, and `DictCounter` is a dict-ish counter class.
+implemented as an array, and `DictCounter` is a dict-ish counter class.
 When the number of counters comes to 16k, `RangeCounter` saves 99% of
 time comparing to other two counters. See `perf/...` for details.
 
